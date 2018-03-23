@@ -8,7 +8,6 @@ class App extends Component {
     return (
       <div>
         <InputForm />
-        <h1>Test:</h1>
       </div>
     );
   }

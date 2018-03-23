@@ -1,15 +1,16 @@
 import React, { Component } from "react";
 import { Field, reduxForm } from "redux-form";
 import Calendar from "react-calendar";
+import datejs from "datejs";
 
 class InputForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      date: new Date(),
-      endDate: new Date(),
-      duration: [new Date(), new Date()],
+      date: Date.today(),
+      endDate: Date.today(),
+      duration: [Date.today(), Date.today()],
       length: 1,
       country: "us"
     };
@@ -49,27 +50,15 @@ class InputForm extends Component {
     );
   }
 
-  advance(time, length) {
-    time = Date.parse(time);
-    console.log(time);
-    var endDay = new Date(
-      new Date(time).getTime() + 1000 * 60 * 60 * 24 * length
-    );
-    return endDay;
-  }
-
   onSubmit(values) {
-    const end = this.advance(values.date, values.length);
-    console.log(end);
+    const start = Date.parse(values.date);
+    const end = Date.parse(values.date);
+    console.log("start" + start);
     this.setState(
       {
-        date: new Date(values.date),
+        date: start,
         length: values.length,
-        endDate: end,
-        duration: [
-          new Date(new Date(values.date).getTime() + 1000 * 60 * 60 * 24),
-          end
-        ],
+        duration: [start, end.add({ days: values.length })],
         country: values.country
       },
       () => {
@@ -82,15 +71,17 @@ class InputForm extends Component {
     const { handleSubmit } = this.props;
 
     function redHelper(date, view, duration) {
-      if (
-        date.getDate() < duration[0].getDate() &&
-        date.getDate() > duration[1].getDate() &&
-        (date.getDay() === 0 || date.getDay() === 6)
-      ) {
-        return true;
-      } else {
-        return false;
-      }
+      // console.log(
+      //   date.getDay(),
+      //   date.getDate(),
+      //   duration[0].getDay(),
+      //   duration[0].getDate()
+      // );
+      return (
+        date.getDate() > duration[0].getDate() &&
+        date.getDate() < duration[1].getDate() &&
+        (date.getDay() == 0 || date.getDay() == 6)
+      );
     }
 
     return (
@@ -109,14 +100,15 @@ class InputForm extends Component {
         <Calendar
           value={this.state.duration}
           tileDisabled={({ date, view }) => {
-            console.log(view);
             return !(
               date.getDate() > this.state.duration[0].getDate() &&
               date.getDate() < this.state.duration[1].getDate()
             );
           }}
           tileClassName={({ date, view }) => {
-            redHelper(date, view, this.state.duration) ? "redBack" : null;
+            return redHelper(date, view, this.state.duration)
+              ? "redBack"
+              : null;
           }}
         />
       </div>

@@ -33,5 +33,7 @@
 
 .redBack {
   background-color: red !important;
-  color: purple !important;
+}
+.redBack:hover {
+  background-color: pink !important;
 }
