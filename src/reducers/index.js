@@ -1,8 +1,9 @@
 import { combineReducers } from "redux";
-import DateReducer from "./date_reducer";
+
+import { reducer as formReducer } from "redux-form";
 
 const rootReducer = combineReducers({
-  date: DateReducer
+  form: formReducer
 });
 
 export default rootReducer;
