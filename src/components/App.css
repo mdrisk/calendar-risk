@@ -37,3 +37,9 @@
 .redBack:hover {
   background-color: pink !important;
 }
+.purpleBack {
+  background-color: purple !important;
+}
+.purpleBack:hover {
+  background-color: #bf5fff !important;
+}
