@@ -19,7 +19,7 @@ class InputForm extends Component {
   renderDateField(field) {
     return (
       <div>
-        <label>Date</label>
+        <label>Start Date</label>
         <input type="date" {...field.input} />
         <div className="text-help">
           {field.meta.touched ? field.meta.error : ""}
@@ -54,24 +54,117 @@ class InputForm extends Component {
     const start = Date.parse(values.date);
     const end = Date.parse(values.date);
     end.addDays(values.length);
-    console.log("start" + start);
-    this.setState(
-      {
-        date: start,
-        length: values.length,
-        duration: [start, end],
-        country: values.country
-      },
-      () => {
-        console.log(this.state.duration);
-      }
-    );
+    this.setState({
+      date: start,
+      length: values.length,
+      duration: [start, end],
+      country: values.country
+    });
   }
 
   render() {
     const { handleSubmit } = this.props;
+    const calendarArr = [];
+    let month1 = this.state.duration[0].getMonth() + 1;
+    let month2 = this.state.duration[1].getMonth() + 1;
+    let year1 = this.state.duration[0].getFullYear();
+    let year2 = this.state.duration[1].getFullYear();
 
-    function redHelper(date, view, duration) {
+    while (year1 < year2) {
+      for (var i = month1; i < 13; i++) {
+        calendarArr.push({
+          month: i,
+          year: year1
+        });
+      }
+      year1++;
+      month1 = 1;
+    }
+    while (year1 === year2 && month1 <= month2) {
+      calendarArr.push({
+        month: month1,
+        year: year1
+      });
+      month1++;
+    }
+
+    const duration = this.state.duration;
+    const calendarList = calendarArr.map(function(map_date) {
+      if (
+        calendarArr[0].month !== map_date.month ||
+        calendarArr[0].year !== map_date.year
+      ) {
+        var updatedDate = [
+          Date.parse(`${map_date.month}-01-${map_date.year}`),
+          duration[1]
+        ];
+        return (
+          <div
+            key={`${map_date.month} + ${map_date.year}`}
+            style={{ display: "inline" }}
+          >
+            <Calendar
+              value={updatedDate}
+              onClickDay={null}
+              tileClassName={({ date, view }) => {
+                return holiday(date, view, updatedDate)
+                  ? "purpleBack"
+                  : yellowHelper(date, view, updatedDate)
+                    ? "yellowBack"
+                    : (date.isAfter(duration[0]) &&
+                        date.isBefore(duration[1])) ||
+                      date.equals(duration[0]) ||
+                      date.equals(duration[1])
+                      ? "greenBack"
+                      : "grayBack";
+              }}
+              tileDisabled={({ date, view }) => {
+                return date.isAfter(Date.parse(duration[1]));
+              }}
+              nextLabel={""}
+              next2Label={""}
+              prevLabel={""}
+              prev2Label={""}
+              showNeighboringMonth={false}
+            />
+          </div>
+        );
+      } else {
+        return (
+          <div
+            key={`${map_date.month} + ${map_date.year}`}
+            style={{ display: "inline" }}
+          >
+            <Calendar
+              value={duration}
+              onClickDay={null}
+              tileClassName={({ date, view }) => {
+                return holiday(date, view, duration)
+                  ? "purpleBack"
+                  : yellowHelper(date, view, duration)
+                    ? "yellowBack"
+                    : (date.isAfter(duration[0]) &&
+                        date.isBefore(duration[1])) ||
+                      date.equals(duration[0]) ||
+                      date.equals(duration[1])
+                      ? "greenBack"
+                      : "grayBack";
+              }}
+              tileDisabled={({ date, view }) => {
+                return date.isBefore(duration[0]) || date.isAfter(duration[1]);
+              }}
+              nextLabel={""}
+              nextLabel2={""}
+              prevLabel={""}
+              prevLabel2={""}
+              showNeighboringMonth={false}
+            />
+          </div>
+        );
+      }
+    });
+
+    function yellowHelper(date, view, duration) {
       return (
         (date.isAfter(duration[0]) || date.equals(duration[0])) &&
         (date.isBefore(duration[1]) || date.equals(duration[1])) &&
@@ -79,28 +172,30 @@ class InputForm extends Component {
       );
     }
     function holiday(date, view, duration) {
-      const janHoli = Date.parse("01-01");
-      const febHoli = Date.parse("02-01");
-      const aprHoli = Date.parse("04-01");
-      const mayHoli = Date.parse("05-01");
-      const sepHoli = Date.parse("09-01");
-      const octHoli = Date.parse("10-01");
-      const novHoli1 = Date.parse("11-01");
-      const novHoli2 = Date.parse("11-01");
-      const decHoli = Date.parse("12-01");
+      const year = duration[0].getFullYear();
+      console.log(year);
+      const janHoli = Date.parse(`01-01-${year}`);
+      const febHoli = Date.parse(`02-01-${year}`);
+      const aprHoli = Date.parse(`04-01-${year}`);
+      const mayHoli = Date.parse(`05-01-${year}`);
+      const sepHoli = Date.parse(`09-01-${year}`);
+      const octHoli = Date.parse(`10-01-${year}`);
+      const novHoli1 = Date.parse(`11-01-${year}`);
+      const novHoli2 = Date.parse(`11-01-${year}`);
+      const decHoli = Date.parse(`12-01-${year}`);
       const bank_holidays = [
-        Date.parse("01-01"),
+        Date.parse(`01-01-${year}`),
         janHoli.moveToNthOccurrence(1, 3),
         febHoli.moveToNthOccurrence(1, 3),
         aprHoli.moveToNthOccurrence(0, 1),
         mayHoli.moveToNthOccurrence(1, -1),
-        Date.parse("07-04"),
+        Date.parse(`07-04-${year}`),
         sepHoli.moveToNthOccurrence(1, 1),
         octHoli.moveToNthOccurrence(1, 2),
         novHoli1.moveToNthOccurrence(1, 2),
         novHoli2.moveToNthOccurrence(4, 4),
-        Date.parse("12-25"),
-        Date.parse("12-31")
+        Date.parse(`12-25-${year}`),
+        Date.parse(`12-31-${year}`)
       ];
       var filtered = bank_holidays.filter(function(bank_holiday) {
         return (
@@ -125,21 +220,7 @@ class InputForm extends Component {
             Submit
           </button>
         </form>
-        <Calendar
-          value={this.state.duration}
-          onClickDay={null}
-          tileDisabled={({ date, view }) => {
-            return (
-              date.isAfter(this.state.duration[1]) &&
-              date.isBefore(this.state.duration[0])
-            );
-          }}
-          tileClassName={({ date, view }) => {
-            return holiday(date, view, this.state.duration)
-              ? "purpleBack"
-              : redHelper(date, view, this.state.duration) ? "redBack" : null;
-          }}
-        />
+        <div>{calendarList}</div>
       </div>
     );
   }

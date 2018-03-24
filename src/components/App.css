@@ -31,15 +31,25 @@
   }
 }
 
-.redBack {
-  background-color: red !important;
+.yellowBack {
+  background-color: #dfdf08 !important;
 }
-.redBack:hover {
-  background-color: pink !important;
+.yellowBack:hover {
+  background-color: #f6f666 !important;
 }
 .purpleBack {
   background-color: purple !important;
 }
 .purpleBack:hover {
   background-color: #bf5fff !important;
+}
+.greenBack {
+  background-color: #2fa525 !important;
+}
+.greenBack:hover {
+  background-color: #1ef00b !important;
+}
+.grayBack {
+  background-color: #888888 !important;
+  color: #888888 !important;
 }
